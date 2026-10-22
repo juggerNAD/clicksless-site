@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Clicksless — Simple automations for small local businesses</title>
+<meta name="description" content="Missed-call text back, booking reminders, review requests and follow-ups that run on their own, set up for small local businesses.">
+<meta property="og:title" content="Clicksless — Fewer clicks, more customers">
+<meta property="og:description" content="Missed-call text back, booking reminders, review requests and follow-ups that run on their own.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://clicksless.site/">
+<meta property="og:site_name" content="Clicksless">
+<meta name="twitter:card" content="summary">
+<link rel="canonical" href="https://clicksless.site/">
+<meta name="theme-color" content="#4A2370">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='10' fill='%234A2370'/%3E%3Cpath d='M9 16.5l4.5 4.5L23 11' stroke='%23FFD95A' stroke-width='3.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400..800&family=Young+Serif&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F1FB; --surface:#FFFFFF; --sunk:#ECE5F6; --ink:#22132F; --muted:#5E516B; --line:#DCD2E8;
+  --accent:#4A2370; --on-accent:#FFFFFF;
+  --band:#4A2370; --band-ink:#FFFFFF; --band-muted:#D9C8EE; --band-deep:#2C1145;
+  --butter:#FFD95A; --on-butter:#2A1B00; --mint:#1E9E6A; --err:#C23B3B;
+  --bubble-in:#ECE5F6; --bubble-out:#4A2370; --on-out:#FFFFFF;
+  --serif:"Young Serif", Georgia, "Times New Roman", serif;
+  --sans:"Figtree", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --wrap:1160px;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#150C1D; --surface:#1F1429; --sunk:#2A1C37; --ink:#F1EAF8; --muted:#B3A6C2; --line:#3A2A4B;
+    --accent:#C8A4F2; --on-accent:#150C1D;
+    --band:#2E1647; --band-muted:#CDB8E6; --band-deep:#12071D;
+    --mint:#4FD39A; --err:#FF8C8C; --bubble-in:#2A1C37; --bubble-out:#6B3FA0;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#150C1D; --surface:#1F1429; --sunk:#2A1C37; --ink:#F1EAF8; --muted:#B3A6C2; --line:#3A2A4B;
+  --accent:#C8A4F2; --on-accent:#150C1D;
+  --band:#2E1647; --band-muted:#CDB8E6; --band-deep:#12071D;
+  --mint:#4FD39A; --err:#FF8C8C; --bubble-in:#2A1C37; --bubble-out:#6B3FA0;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-behavior:smooth; scroll-padding-top:calc(env(safe-area-inset-top,0px) + 80px)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:1.0625rem; line-height:1.6; -webkit-font-smoothing:antialiased; overflow-x:hidden}
+body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top,0px); z-index:60; background:var(--surface)}
+img,svg{max-width:100%}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--butter); outline-offset:3px; border-radius:8px}
+.wrap{max-width:var(--wrap); margin:0 auto; padding:0 clamp(20px,4vw,40px)}
+h1,h2,h3{font-family:var(--serif); font-weight:400; letter-spacing:-.01em}
+
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:14px 26px; border-radius:999px; font:700 1rem/1.1 var(--sans); text-decoration:none; cursor:pointer; border:0; transition:background .15s, transform .12s}
+.btn:active{transform:scale(.97)}
+.btn-butter{background:var(--butter); color:var(--on-butter)}
+.btn-butter:hover{background:#FFE58A}
+.btn-plum{background:var(--accent); color:var(--on-accent)}
+.btn-plum:hover{filter:brightness(1.1)}
+.btn-soft{background:var(--sunk); color:var(--ink)}
+.btn-soft:hover{background:var(--line)}
+@media (prefers-reduced-motion:reduce){.btn{transition:none}.btn:active{transform:none}}
+
+/* Header */
+.top{position:sticky; top:env(safe-area-inset-top,0px); z-index:50; background:color-mix(in srgb,var(--surface) 92%,transparent); backdrop-filter:blur(10px); border-bottom:1px solid var(--line)}
+.top .wrap{display:flex; align-items:center; gap:22px; height:70px}
+.brand{display:flex; align-items:center; gap:10px; text-decoration:none}
+.brand svg{width:34px; height:34px; flex:none}
+.brand span{font-family:var(--serif); font-size:1.6rem; line-height:1; letter-spacing:-.02em}
+.nav{display:flex; gap:26px; margin-left:auto}
+.nav a{text-decoration:none; color:var(--muted); font-weight:600; font-size:.98rem}
+.nav a:hover{color:var(--ink)}
+.icon-btn{width:42px; height:42px; border-radius:50%; border:0; background:var(--sunk); color:var(--ink); display:grid; place-items:center; cursor:pointer}
+.icon-btn:hover{background:var(--line)}
+.icon-btn svg{width:18px; height:18px}
+.top .btn{padding:10px 18px; font-size:.95rem}
+.menu-btn{display:none}
+@media (max-width:900px){
+  .nav{display:none; position:absolute; top:70px; left:0; right:0; flex-direction:column; gap:0; background:var(--surface); border-bottom:1px solid var(--line); padding:6px clamp(20px,4vw,40px) 18px}
+  .nav.open{display:flex}
+  .nav a{padding:12px 0; font-size:1.15rem; color:var(--ink)}
+  .menu-btn{display:grid; margin-left:auto}
+  .top .btn{display:none}
+}
+
+/* Hero */
+.hero{padding:clamp(40px,6vw,80px) 0 clamp(56px,7vw,96px)}
+.hero .grid{display:grid; grid-template-columns:1.1fr .9fr; gap:clamp(36px,6vw,80px); align-items:center}
+.hero .grid > *{min-width:0}
+.hero h1{font-size:clamp(2.6rem,5.8vw,4.6rem); line-height:1.04; margin:0 0 22px; text-wrap:balance}
+.lede{font-size:clamp(1.12rem,1.6vw,1.28rem); color:var(--muted); max-width:42ch; margin:0 0 30px}
+.ctas{display:flex; flex-wrap:wrap; gap:12px}
+.hero .note{margin:20px 0 0; font-size:.95rem; color:var(--muted)}
+.biz{margin-top:34px}
+.biz p{margin:0 0 10px; font-weight:700; font-size:.98rem}
+.chips{display:flex; flex-wrap:wrap; gap:8px}
+.chip{border:0; background:var(--surface); color:var(--ink); box-shadow:inset 0 0 0 1.5px var(--line); padding:8px 16px; border-radius:999px; font:600 .95rem var(--sans); cursor:pointer}
+.chip:hover{box-shadow:inset 0 0 0 1.5px var(--ink)}
+.chip[aria-pressed="true"]{background:var(--accent); color:var(--on-accent); box-shadow:none}
+@media (max-width:920px){.hero .grid{grid-template-columns:minmax(0,1fr)}}
+
+/* Phone demo: the signature piece */
+.phone-stage{display:grid; place-items:center; position:relative}
+.phone-stage::before{content:""; position:absolute; width:86%; aspect-ratio:1; border-radius:50%; background:var(--butter); opacity:.55; z-index:0}
+.phone{position:relative; z-index:1; width:min(330px,100%); background:var(--band-deep); border-radius:44px; padding:12px; box-shadow:0 30px 60px -20px rgba(44,17,69,.45)}
+.screen{background:var(--surface); border-radius:34px; overflow:hidden; height:560px; display:flex; flex-direction:column}
+.sc-head{display:flex; align-items:center; gap:10px; padding:20px 18px 12px; border-bottom:1px solid var(--line)}
+.avatar{width:36px; height:36px; border-radius:50%; background:var(--accent); color:var(--on-accent); display:grid; place-items:center; font-weight:800; font-size:.95rem; flex:none}
+.sc-head b{display:block; font-size:.98rem; line-height:1.2}
+.sc-head small{display:block; color:var(--muted); font-size:.8rem}
+.thread{flex:1; padding:14px 14px 18px; display:flex; flex-direction:column; gap:9px; overflow:hidden; justify-content:flex-end}
+.msg{max-width:84%; padding:9px 13px; border-radius:18px; font-size:.9rem; line-height:1.38; opacity:0; transform:translateY(8px); transition:opacity .3s, transform .3s}
+.msg.show{opacity:1; transform:none}
+.msg.in{align-self:flex-start; background:var(--bubble-in); color:var(--ink); border-bottom-left-radius:6px}
+.msg.out{align-self:flex-end; background:var(--bubble-out); color:var(--on-out); border-bottom-right-radius:6px}
+.msg.sys{align-self:center; max-width:100%; background:transparent; color:var(--muted); font-size:.8rem; font-weight:600; padding:2px 8px; text-align:center}
+.msg.sys.miss{color:var(--err)}
+.msg.sys.win{color:var(--mint)}
+.msg .auto{display:block; font-size:.72rem; opacity:.75; margin-top:3px; font-weight:600}
+.sc-foot{padding:12px 16px 18px; border-top:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; gap:10px}
+.sc-foot span{font-size:.82rem; color:var(--muted)}
+.sc-foot button{background:none; border:0; color:var(--accent); font:700 .85rem var(--sans); cursor:pointer; padding:4px 0}
+@media (prefers-reduced-motion:reduce){.msg{transition:none}}
+@media (max-width:420px){.screen{height:500px}}
+
+/* Sections */
+section{padding:clamp(72px,9vw,116px) 0}
+.alt{background:var(--surface)}
+.sec-head{max-width:640px; margin-bottom:clamp(34px,5vw,54px)}
+.sec-head h2{font-size:clamp(2.1rem,4.4vw,3.3rem); line-height:1.08; margin:0 0 14px; text-wrap:balance}
+.sec-head p{margin:0; color:var(--muted); font-size:1.1rem}
+
+/* Leaks */
+.leaks{display:grid; grid-template-columns:repeat(3,1fr); gap:clamp(18px,3vw,32px)}
+.leak{padding-top:20px; border-top:2px solid var(--ink)}
+.leak h3{font-size:1.45rem; line-height:1.2; margin:0 0 10px}
+.leak p{margin:0; color:var(--muted)}
+@media (max-width:820px){.leaks{grid-template-columns:1fr}}
+
+/* Bundle builder */
+.builder{display:grid; grid-template-columns:1.35fr 1fr; gap:clamp(24px,4vw,48px); align-items:start}
+.autos{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+.auto-card{position:relative; display:block; cursor:pointer}
+.auto-card input{position:absolute; opacity:0; width:1px; height:1px}
+.auto-body{display:block; height:100%; background:var(--bg); border-radius:18px; padding:20px 20px 18px; box-shadow:inset 0 0 0 1.5px var(--line); transition:box-shadow .15s, background .15s}
+.auto-card:hover .auto-body{box-shadow:inset 0 0 0 1.5px var(--ink)}
+.auto-card input:checked + .auto-body{background:color-mix(in srgb,var(--accent) 10%,var(--surface)); box-shadow:inset 0 0 0 2.5px var(--accent)}
+.auto-card input:focus-visible + .auto-body{outline:3px solid var(--butter); outline-offset:3px}
+.auto-top{display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:8px}
+.auto-top b{font-size:1.06rem; line-height:1.3}
+.tick{flex:none; width:24px; height:24px; border-radius:50%; box-shadow:inset 0 0 0 1.5px var(--line); display:grid; place-items:center; color:transparent; background:var(--surface)}
+.tick svg{width:14px; height:14px}
+.auto-card input:checked + .auto-body .tick{background:var(--accent); color:var(--on-accent); box-shadow:none}
+.auto-body p{margin:0 0 10px; color:var(--muted); font-size:.95rem; line-height:1.5}
+.auto-body small{font-weight:700; font-size:.86rem; color:var(--mint)}
+.summary{position:sticky; top:96px; background:var(--band); color:var(--band-ink); border-radius:24px; padding:clamp(24px,3vw,34px)}
+.summary h3{font-size:1.55rem; margin:0 0 6px}
+.summary > p{margin:0 0 20px; color:var(--band-muted)}
+.sum-num{font-family:var(--serif); font-size:clamp(3.4rem,7vw,4.8rem); line-height:1; color:var(--butter); margin:0}
+.sum-num small{display:block; font-family:var(--sans); font-size:1rem; font-weight:600; color:var(--band-ink); margin-top:8px}
+.sum-list{list-style:none; margin:22px 0 0; padding:18px 0 0; border-top:1px solid color-mix(in srgb,var(--band-ink) 22%,transparent); min-height:40px}
+.sum-list li{display:flex; gap:10px; align-items:baseline; margin-bottom:6px; font-weight:600; font-size:.96rem}
+.sum-list li::before{content:""; flex:none; width:8px; height:8px; border-radius:50%; background:var(--butter); translate:0 -2px}
+.sum-list .empty{color:var(--band-muted); font-weight:500}
+.sum-list .empty::before{display:none}
+.summary .btn{margin-top:22px; width:100%}
+.summary .fine{margin:12px 0 0; font-size:.84rem; color:var(--band-muted)}
+@media (max-width:900px){.builder{grid-template-columns:1fr}.summary{position:static}}
+@media (max-width:560px){.autos{grid-template-columns:1fr}}
+
+/* Steps (a real sequence) */
+.steps{list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(3,1fr); gap:clamp(22px,4vw,44px); counter-reset:s}
+.steps li{counter-increment:s}
+.steps li::before{content:counter(s); display:grid; place-items:center; width:50px; height:50px; border-radius:50%; background:var(--butter); color:var(--on-butter); font-family:var(--serif); font-size:1.5rem; margin-bottom:18px}
+.steps h3{font-size:1.45rem; margin:0 0 8px}
+.steps p{margin:0; color:var(--muted)}
+@media (max-width:760px){.steps{grid-template-columns:1fr}}
+
+/* Works with */
+.works{display:flex; flex-wrap:wrap; gap:10px}
+.works span{background:var(--bg); padding:10px 18px; border-radius:999px; font-weight:600; font-size:.98rem}
+
+/* FAQ */
+.faq{max-width:820px}
+.faq details{background:var(--surface); border-radius:18px; margin-bottom:10px; padding:0 22px}
+.faq summary{cursor:pointer; list-style:none; display:flex; justify-content:space-between; align-items:center; gap:18px; padding:20px 0; font-weight:700; font-size:1.12rem}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+"; flex:none; width:30px; height:30px; border-radius:50%; display:grid; place-items:center; background:var(--sunk); font-size:1.2rem}
+.faq details[open] summary::after{content:"−"; background:var(--butter); color:var(--on-butter)}
+.faq details p{margin:0 0 20px; color:var(--muted); max-width:62ch}
+
+/* Contact */
+.contact-sec{background:var(--band); color:var(--band-ink)}
+.contact{display:grid; grid-template-columns:.85fr 1.15fr; gap:clamp(32px,5vw,64px)}
+.contact h2{font-size:clamp(2.3rem,4.8vw,3.6rem); line-height:1.06; margin:0 0 18px; text-wrap:balance}
+.contact .side p{color:var(--band-muted); font-size:1.1rem; max-width:40ch}
+.contact .side ul{list-style:none; margin:24px 0 0; padding:0}
+.contact .side li{display:flex; gap:12px; align-items:baseline; margin-bottom:10px; font-weight:600}
+.contact .side li::before{content:""; flex:none; width:10px; height:10px; border-radius:50%; background:var(--butter); translate:0 -1px}
+.cform{background:var(--surface); color:var(--ink); border-radius:26px; padding:clamp(22px,3vw,36px); display:grid; gap:18px}
+.cform .two{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+.cform label,.cform legend{display:block; font-weight:700; font-size:.96rem; margin-bottom:7px; padding:0}
+.cform .opt{font-weight:500; color:var(--muted)}
+.cform fieldset{border:0; margin:0; padding:0; min-width:0}
+.cform input[type=text],.cform input[type=email],.cform input[type=tel],.cform textarea{width:100%; font:inherit; font-size:1rem; color:var(--ink); background:var(--bg); border:1.5px solid var(--line); border-radius:14px; padding:12px 14px}
+.cform input:focus,.cform textarea:focus{outline:none; border-color:var(--accent)}
+.cform textarea{min-height:120px; resize:vertical}
+.cform .hp{display:none}
+.pick{display:flex; flex-wrap:wrap; gap:8px}
+.pick label{margin:0; font-weight:600; font-size:.93rem; cursor:pointer}
+.pick input{position:absolute; opacity:0; width:1px; height:1px}
+.pick span{display:inline-block; padding:8px 14px; border-radius:999px; background:var(--bg); box-shadow:inset 0 0 0 1.5px var(--line)}
+.pick label:hover span{box-shadow:inset 0 0 0 1.5px var(--ink)}
+.pick input:checked + span{background:var(--accent); color:var(--on-accent); box-shadow:none}
+.pick input:focus-visible + span{outline:3px solid var(--butter); outline-offset:2px}
+.picked{margin:0; background:var(--sunk); padding:12px 16px; border-radius:14px; font-size:.94rem}
+.picked[hidden]{display:none}
+.picked b{display:block; margin-bottom:2px}
+.picked button{background:none; border:0; padding:0; margin-top:4px; color:var(--accent); font:700 .88rem var(--sans); cursor:pointer; text-decoration:underline}
+.cform .btn{justify-self:start}
+.form-msg{margin:0; font-weight:600; font-size:.96rem}
+.form-msg.ok{color:var(--mint)} .form-msg.err{color:var(--err)}
+@media (max-width:880px){.contact{grid-template-columns:1fr}}
+@media (max-width:520px){.cform .two{grid-template-columns:1fr}}
+
+footer{padding:34px 0 44px; color:var(--muted); font-size:.92rem}
+footer .wrap{display:flex; justify-content:space-between; flex-wrap:wrap; gap:14px; align-items:center}
+footer .brand span{font-size:1.3rem}
+footer a{color:var(--muted)}
+
+/* Mobile sticky call to action */
+.mcta{display:none}
+@media (max-width:900px){
+  .mcta{display:flex; position:fixed; left:16px; right:16px; bottom:calc(14px + env(safe-area-inset-bottom,0px)); z-index:40; box-shadow:0 10px 30px -8px rgba(0,0,0,.35); transition:transform .25s, opacity .25s}
+  .mcta.hide{transform:translateY(160%); opacity:0; pointer-events:none}
+  footer{padding-bottom:110px}
+}
+@media (prefers-reduced-motion:reduce){.mcta{transition:none}}
+</style>
+</head>
+<body>
+
+<header class="top" id="top">
+  <div class="wrap">
+    <a class="brand" href="#" aria-label="Clicksless home">
+      <svg viewBox="0 0 34 34" aria-hidden="true"><rect width="34" height="34" rx="11" fill="#4A2370"/><path d="M10 17.5l4.6 4.6L24.5 12" stroke="#FFD95A" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Clicksless</span>
+    </a>
+    <nav class="nav" id="nav" aria-label="Main">
+      <a href="#leaks">Why</a>
+      <a href="#builder">Automations</a>
+      <a href="#how">How it works</a>
+      <a href="#faq">FAQ</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <button class="icon-btn" id="themeBtn" type="button" aria-label="Switch color theme">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+    <a class="btn btn-plum" href="#contact">Get a free setup plan</a>
+    <button class="icon-btn menu-btn" id="menuBtn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+  </div>
+</header>
+
+<main>
+<section class="hero" aria-labelledby="hero-title">
+  <div class="wrap grid">
+    <div>
+      <h1 id="hero-title">Stop losing customers to missed calls and forgotten follow-ups.</h1>
+      <p class="lede">I set up simple automations for small local businesses. Missed calls get a text back, bookings get reminders, and happy customers get asked for a review, all without you touching your phone.</p>
+      <div class="ctas">
+        <a class="btn btn-butter" href="#builder">Pick what you need</a>
+        <a class="btn btn-soft" href="#contact">Get a free setup plan</a>
+      </div>
+      <p class="note">Works with the tools you already use. No new software to learn.</p>
+      <div class="biz">
+        <p>See it for your kind of business</p>
+        <div class="chips" id="bizChips" role="group" aria-label="Business type"></div>
+      </div>
+    </div>
+
+    <div class="phone-stage">
+      <div class="phone" role="img" aria-labelledby="phoneLabel">
+        <span class="sr" id="phoneLabel" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Example text conversation handled automatically</span>
+        <div class="screen">
+          <div class="sc-head">
+            <span class="avatar" id="scAvatar">G</span>
+            <div><b id="scName">Greenline Lawn &amp; Garden</b><small>Business text line</small></div>
+          </div>
+          <div class="thread" id="thread" aria-live="polite"></div>
+          <div class="sc-foot">
+            <span id="scFoot">Handled automatically</span>
+            <button type="button" id="replay">Replay</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="leaks" class="alt" aria-labelledby="leaks-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 id="leaks-title">Where small businesses quietly lose money</h2>
+      <p>You’re busy doing the actual work. These are the moments that slip through while you are.</p>
+    </div>
+    <div class="leaks">
+      <article class="leak">
+        <h3>The call you couldn’t pick up</h3>
+        <p>You’re on a job or with a client. The caller doesn’t leave a message; they just call the next business on the list.</p>
+      </article>
+      <article class="leak">
+        <h3>The appointment nobody remembered</h3>
+        <p>A no-show costs you the slot and the drive. One reminder text the day before stops most of them.</p>
+      </article>
+      <article class="leak">
+        <h3>The happy customer who never reviewed</h3>
+        <p>They loved the work but nobody asked. More reviews means more people pick you over the business next door.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="builder" aria-labelledby="builder-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 id="builder-title">Pick the automations you want</h2>
+      <p>Tap the ones that fit your business. I’ll send back a setup plan and a fixed price for exactly those.</p>
+    </div>
+    <div class="builder">
+      <div class="autos" id="autos"></div>
+      <aside class="summary" aria-live="polite">
+        <h3>Your setup</h3>
+        <p>Estimated time back each week</p>
+        <p class="sum-num"><span id="sumHours">0</span><small>hours a week</small></p>
+        <ul class="sum-list" id="sumList"><li class="empty">Nothing picked yet</li></ul>
+        <a class="btn btn-butter" href="#contact" id="sendPicks">Get a price for these</a>
+        <p class="fine">Estimates are typical for a small team and vary by business.</p>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<section id="how" class="alt" aria-labelledby="how-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 id="how-title">How it works</h2>
+      <p>No long contracts and no tech skills needed on your side.</p>
+    </div>
+    <ol class="steps">
+      <li><h3>Tell me how you work</h3><p>Pick your automations and describe your day. I reply within one business day with a plan and a fixed price.</p></li>
+      <li><h3>I set it all up</h3><p>I connect your phone line, calendar, email and review page, then test everything with you before it goes live.</p></li>
+      <li><h3>It runs on its own</h3><p>You get a short video showing what happens and when. If anything needs changing later, just send a message.</p></li>
+    </ol>
+    <div style="margin-top:clamp(48px,7vw,80px)">
+      <h3 style="font-size:1.5rem; margin:0 0 16px">Works with the tools you already have</h3>
+      <div class="works">
+        <span>Google Business Profile</span><span>Google Calendar</span><span>Gmail</span><span>Outlook</span><span>Calendly</span><span>Square</span><span>QuickBooks</span><span>Facebook &amp; Instagram</span><span>Google Sheets</span><span>Your business phone number</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq" aria-labelledby="faq-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 id="faq-title">Common questions</h2>
+    </div>
+    <div class="faq">
+      <details><summary>I’m not very techy. Is that a problem?</summary><p>Not at all. I handle the setup. You’ll get a short video showing what happens, and you won’t need to change how you work day to day.</p></details>
+      <details><summary>Do I need to buy new software?</summary><p>Usually not. I build on what you already use. If something small is needed, like a texting number, I’ll explain the cost before anything is set up.</p></details>
+      <details><summary>What does it cost?</summary><p>You get a fixed price for your setup before any work starts. An optional monthly care plan covers changes and checkups if you want it.</p></details>
+      <details><summary>Will the texts sound like a robot?</summary><p>No. Every message is written in your business’s voice, and you approve the wording before it goes live.</p></details>
+      <details><summary>How fast can it be running?</summary><p>Most single automations are live within a few days of your approval. Bigger bundles take about a week or two.</p></details>
+    </div>
+  </div>
+</section>
+
+<section id="contact" class="contact-sec" aria-labelledby="contact-title">
+  <div class="wrap contact">
+    <div class="side">
+      <h2 id="contact-title">Get your free setup plan</h2>
+      <p>Tell me about your business and what keeps slipping through. You’ll get a plan and a fixed price within one business day.</p>
+      <ul>
+        <li>No long contracts</li>
+        <li>Written in your business’s voice</li>
+        <li>Video walkthrough with every setup</li>
+      </ul>
+    </div>
+
+    <form class="cform" id="contactForm" novalidate>
+      <p class="hp"><label>Leave this empty <input name="website-url" tabindex="-1" autocomplete="off"></label></p>
+      <div class="two">
+        <div><label for="cf-name">Your name</label><input type="text" id="cf-name" name="name" autocomplete="name" required></div>
+        <div><label for="cf-email">Email</label><input type="email" id="cf-email" name="email" autocomplete="email" required></div>
+      </div>
+      <div class="two">
+        <div><label for="cf-business">Business name</label><input type="text" id="cf-business" name="business" autocomplete="organization" required></div>
+        <div><label for="cf-phone">Phone <span class="opt">(optional)</span></label><input type="tel" id="cf-phone" name="phone" autocomplete="tel"></div>
+      </div>
+      <fieldset>
+        <legend>Type of business</legend>
+        <div class="pick" id="typePick">
+          <label><input type="radio" name="business-type" value="Landscaping or lawn care" checked><span>Landscaping or lawn care</span></label>
+          <label><input type="radio" name="business-type" value="Salon or spa"><span>Salon or spa</span></label>
+          <label><input type="radio" name="business-type" value="Cleaning service"><span>Cleaning service</span></label>
+          <label><input type="radio" name="business-type" value="Auto repair"><span>Auto repair</span></label>
+          <label><input type="radio" name="business-type" value="Other home or local service"><span>Something else</span></label>
+        </div>
+      </fieldset>
+      <p class="picked" id="pickedNote" hidden></p>
+      <input type="hidden" name="automations" id="cf-automations">
+      <div>
+        <label for="cf-msg">What keeps slipping through?</label>
+        <textarea id="cf-msg" name="message" placeholder="I miss calls when I’m on a job and people don’t leave voicemails…" required></textarea>
+      </div>
+      <button class="btn btn-plum" type="submit" id="cf-submit">Send my request</button>
+      <p class="form-msg" id="formMsg" role="status"></p>
+    </form>
+  </div>
+</section>
+</main>
+
+<a class="btn btn-butter mcta hide" id="mcta" href="#contact">Get a free setup plan</a>
+
+<footer>
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Back to top">
+      <svg viewBox="0 0 34 34" aria-hidden="true"><rect width="34" height="34" rx="11" fill="#4A2370"/><path d="M10 17.5l4.6 4.6L24.5 12" stroke="#FFD95A" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Clicksless</span>
+    </a>
+    <span>© <span id="yr">2026</span> Clicksless. Simple automations for small local businesses.</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  /* Paste your Apps Script web app URL here (ends in /exec) */
+  var SCRIPT_URL='PASTE_YOUR_APPS_SCRIPT_URL_HERE';
+
+  var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* Theme */
+  var root=document.documentElement;
+  try{var saved=localStorage.getItem('cs-theme'); if(saved) root.setAttribute('data-theme',saved);}catch(e){}
+  document.getElementById('themeBtn').addEventListener('click',function(){
+    var cur=root.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+    var next=cur==='dark'?'light':'dark'; root.setAttribute('data-theme',next);
+    try{localStorage.setItem('cs-theme',next);}catch(e){}
+  });
+
+  /* Mobile menu */
+  var menuBtn=document.getElementById('menuBtn'), nav=document.getElementById('nav');
+  menuBtn.addEventListener('click',function(){var o=nav.classList.toggle('open'); menuBtn.setAttribute('aria-expanded',o)});
+  nav.addEventListener('click',function(e){if(e.target.tagName==='A'){nav.classList.remove('open'); menuBtn.setAttribute('aria-expanded',false)}});
+
+  /* Phone demo */
+  var bizzes=[
+    {label:'Landscaping',type:'Landscaping or lawn care',name:'Greenline Lawn & Garden',av:'G',foot:'Booked while you were mowing',msgs:[
+      ['sys miss','Missed call · (555) 014-2290'],
+      ['out','Hi, sorry we missed you! This is Greenline Lawn & Garden. What can we help with?',1],
+      ['in','Need a quote for weekly mowing and hedge trimming'],
+      ['out','Happy to help. Pick a time for a free estimate here: greenline.example/book',1],
+      ['sys win','Estimate booked · Thu 10:00 AM'],
+      ['out','Reminder: we’ll stop by tomorrow at 10:00 AM for your estimate. Reply C to confirm.',1],
+      ['in','C']]},
+    {label:'Salon',type:'Salon or spa',name:'Studio Nine Salon',av:'S',foot:'Rebooked without a phone call',msgs:[
+      ['out','Hi Jess! Reminder: color appointment tomorrow at 2:00 PM. Reply C to confirm or R to reschedule.',1],
+      ['in','R, can I do Saturday?'],
+      ['out','Saturday has 11:00 AM or 3:30 PM open. Which works?',1],
+      ['in','11 please'],
+      ['sys win','Moved to Sat 11:00 AM'],
+      ['out','Thanks for coming in today! Mind leaving a quick review? studionine.example/review',1]]},
+    {label:'Cleaning',type:'Cleaning service',name:'Brightside Cleaning',av:'B',foot:'Quote request answered in seconds',msgs:[
+      ['sys','New request from your website'],
+      ['out','Hi Marcus, thanks for reaching out to Brightside! How many bedrooms and bathrooms?',1],
+      ['in','3 bed 2 bath, every other week'],
+      ['out','Got it. Here’s your estimate and a link to pick a start date: brightside.example/start',1],
+      ['sys win','First clean booked · Mon 9:00 AM']]},
+    {label:'Auto repair',type:'Auto repair',name:'Ridgeway Auto',av:'R',foot:'Customer updated without a call',msgs:[
+      ['out','Hi Dana, your car is checked in at Ridgeway Auto. We’ll text you when the inspection is done.',1],
+      ['out','Inspection done. Front brake pads are worn. Approve the $180 repair? Reply YES or call us.',1],
+      ['in','YES'],
+      ['sys win','Repair approved'],
+      ['out','Your car is ready for pickup! Invoice and payment link: ridgeway.example/pay',1]]}
+  ];
+  var chips=document.getElementById('bizChips'), thread=document.getElementById('thread'), timers=[], current=bizzes[0];
+  bizzes.forEach(function(b,i){
+    var c=document.createElement('button'); c.type='button'; c.className='chip'; c.textContent=b.label; c.setAttribute('aria-pressed',i===0);
+    c.addEventListener('click',function(){[].forEach.call(chips.children,function(x){x.setAttribute('aria-pressed',x===c)}); play(b); setType(b.type)});
+    chips.appendChild(c);
+  });
+  function play(b){
+    current=b; timers.forEach(clearTimeout); timers=[];
+    document.getElementById('scName').textContent=b.name;
+    document.getElementById('scAvatar').textContent=b.av;
+    document.getElementById('scFoot').textContent=b.foot;
+    thread.innerHTML='';
+    b.msgs.forEach(function(m,i){
+      var d=document.createElement('div'); d.className='msg '+m[0]; d.textContent=m[1];
+      if(m[2]){var a=document.createElement('span'); a.className='auto'; a.textContent='Sent automatically'; d.appendChild(a)}
+      thread.appendChild(d);
+      timers.push(setTimeout(function(){d.classList.add('show')}, reduce?0:300+i*900));
+    });
+  }
+  document.getElementById('replay').addEventListener('click',function(){play(current)});
+  play(bizzes[0]);
+
+  /* Bundle builder */
+  var autos=[
+    {id:'missed',t:'Missed-call text back',d:'Anyone you can’t answer gets an instant text, so they wait for you instead of calling someone else.',h:2},
+    {id:'booking',t:'Online booking with reminders',d:'Customers pick a time themselves, then get reminder texts or emails before the appointment.',h:3},
+    {id:'reviews',t:'Review requests',d:'After each job, customers get a friendly message with a direct link to your Google review page.',h:1},
+    {id:'followup',t:'Quote follow-ups',d:'People who asked for a quote but didn’t book get a polite nudge a few days later.',h:1.5},
+    {id:'invoices',t:'Invoice and payment reminders',d:'Unpaid invoices get gentle reminders with a payment link, so you stop chasing them.',h:2},
+    {id:'tracker',t:'Simple customer list',d:'Every call, form and booking lands in one tidy sheet, so you always know who to call back.',h:2}
+  ];
+  var autosEl=document.getElementById('autos'), sumHours=document.getElementById('sumHours'), sumList=document.getElementById('sumList');
+  var check='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  autos.forEach(function(a){
+    var l=document.createElement('label'); l.className='auto-card';
+    l.innerHTML='<input type="checkbox" value="'+a.id+'"><span class="auto-body"><span class="auto-top"><b>'+a.t+'</b><span class="tick">'+check+'</span></span><p>'+a.d+'</p><small>About '+a.h+' h a week back</small></span>';
+    autosEl.appendChild(l);
+  });
+  function picked(){return autos.filter(function(a){return autosEl.querySelector('input[value="'+a.id+'"]').checked})}
+  function updateSummary(){
+    var p=picked(), h=p.reduce(function(s,a){return s+a.h},0);
+    sumHours.textContent=(Math.round(h*10)/10).toString();
+    sumList.innerHTML=p.length?p.map(function(a){return '<li>'+a.t+'</li>'}).join(''):'<li class="empty">Nothing picked yet</li>';
+    syncPicked();
+  }
+  autosEl.addEventListener('change',updateSummary);
+
+  /* Form */
+  var form=document.getElementById('contactForm'), msg=document.getElementById('formMsg'), btn=document.getElementById('cf-submit'),
+      pickedNote=document.getElementById('pickedNote'), autoField=document.getElementById('cf-automations');
+  function syncPicked(){
+    var p=picked();
+    autoField.value=p.map(function(a){return a.t}).join(', ');
+    if(p.length){
+      pickedNote.hidden=false;
+      pickedNote.innerHTML='<b>Automations you picked</b>'+p.map(function(a){return a.t}).join(', ')+'<br><button type="button" id="editPicks">Change picks</button>';
+      document.getElementById('editPicks').addEventListener('click',function(){document.getElementById('builder').scrollIntoView({behavior:reduce?'auto':'smooth'})});
+    } else pickedNote.hidden=true;
+  }
+  function setType(v){var r=form.querySelector('input[name="business-type"][value="'+v+'"]'); if(r) r.checked=true}
+
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    msg.className='form-msg'; msg.textContent='';
+    if(!form.reportValidity()) return;
+    if(SCRIPT_URL.indexOf('/exec')===-1){msg.className='form-msg err'; msg.textContent='The form isn’t connected yet. Add the Apps Script URL to the page.'; return}
+    syncPicked();
+    btn.disabled=true; btn.textContent='Sending…';
+    fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',body:new URLSearchParams(new FormData(form))})
+      .then(function(){
+        form.reset();
+        [].forEach.call(autosEl.querySelectorAll('input'),function(i){i.checked=false}); updateSummary();
+        msg.className='form-msg ok'; msg.textContent='Sent. Your setup plan arrives within one business day.';
+      })
+      .catch(function(){msg.className='form-msg err'; msg.textContent='The request didn’t send. Check your connection and try again.'})
+      .finally(function(){btn.disabled=false; btn.textContent='Send my request'});
+  });
+
+  /* Mobile call to action */
+  var mcta=document.getElementById('mcta');
+  if('IntersectionObserver' in window){
+    var heroIn=true, contactIn=false, upd=function(){mcta.classList.toggle('hide',heroIn||contactIn)};
+    new IntersectionObserver(function(es){heroIn=es[0].isIntersecting; upd()}).observe(document.querySelector('.hero'));
+    new IntersectionObserver(function(es){contactIn=es[0].isIntersecting; upd()}).observe(document.getElementById('contact'));
+  }
+
+  document.getElementById('yr').textContent=new Date().getFullYear();
+})();
+</script>
+</body>
+</html>
